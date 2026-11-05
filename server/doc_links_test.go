@@ -37,7 +37,7 @@ func TestNoDeadDocsLinks(t *testing.T) {
 			default:
 				return nil
 			}
-			data, err := os.ReadFile(path)
+			data, err := os.ReadFile(path) // #nosec G304 - path comes from filepath.WalkDir over this repo's own fixed roots, not external input
 			if err != nil {
 				return err
 			}

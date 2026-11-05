@@ -208,7 +208,13 @@ ifneq ($(HAS_SERVER),)
 	@echo Running golangci-lint
 	$(GO) vet $$($(GO) list ./... | grep -v /webapp/)
 	$(GOBIN)/golangci-lint run ./...
-	$(GO) vet -vettool=$(GOBIN)/mattermost-govet -license -license.year=2019 $$($(GO) list ./... | grep -v /webapp/)
+	# server/doc_links_test.go is Antimatter's own (header "Copyright (c) 2026-present Antimatter
+	# contributors."); this target installs upstream mattermost-govet, which has no notion of a fork
+	# header (only Antimatter's server repo builds the patched tool that accepts it), so the one file
+	# is excluded rather than given a misattributed Mattermost copyright line. (Same issue confirmed
+	# failing this check in antimatter-plugin-jira's CI on 2026-11-05; pre-empted here before gosec's
+	# fix lets this step run.)
+	$(GO) vet -vettool=$(GOBIN)/mattermost-govet -license -license.year=2019 -license.ignore=server/doc_links_test.go $$($(GO) list ./... | grep -v /webapp/)
 endif
 
 ## Builds the server, if it exists, for all supported architectures, unless MM_SERVICESETTINGS_ENABLEDEVELOPER is set
